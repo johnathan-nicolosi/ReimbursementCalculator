@@ -1,119 +1,180 @@
+############################################################
+#                                                          #
+#                  Reimbursement Calulator                 #
+#              Written by: Johnathan Nicolosi              #
+#                                                          #
+############################################################
+
+import json
 import datetime
 from collections import Counter
 
+### Employees ###
+# list of employees
+listEmployees = []
+# number of employees 
+numEmployees = 0
+
 ### Reimbursement rates ###
-# Low Cost Cities
-lcc_td = 45
-lcc_fd = 75
-# High Cost Cities
-hcc_td = 55
-hcc_fd = 85
-
+###########################
+#     Low Cost Cities     #
+###########################
+# travel day reimbursement rate for LCC
+lcc_td_rr = 45
+# full day reimbursement rate for LCC
+lcc_fd_rr = 75
 # number of projects in low cost cities
-lccTotal = 0
+lccTotalDays = 0
+###########################
+#    High Cost Cities     #
+###########################
+# travel day reimbursement rate for HCC
+hcc_td_rr = 55
+# full day reimbursement rate for HCC
+hcc_fd_rr = 85
 # number of projects in high cost cities
-hccTotal = 0
+hccTotalDays = 0
 
-### Calculate Rates ###
-# Default settings
-numberDays = 0
-numberTravelDays = 0
-numberFullDays = 0
-# Calculations
-reimbursement_lcc_td = numberTravelDays * lcc_td
-reimbursement_lcc_fd = numberFullDays * lcc_fd
-reimbursement_hcc_td = numberTravelDays * hcc_td
-reimbursement_hcc_fd = numberFullDays * hcc_fd
+###########################
+#      Date Variables     #
+###########################
+# number of days  
+num_days = 0
+# travel days
+numTravelDays = 0
+numTravelDaysLCC = 0
+numTravelDaysHCC = 0
+# full days
+numFullDays = 0
+numFullDaysLCC = 0
+numFullDaysHCC = 0
 
-# empty lists for start and stop dates
+###########################
+#   Start and End Dates   #
+###########################
+# lists of start and stop dates
 startDates = []
 endDates = []
+# start dates
+lccStartDates = []
+hccStartDates = []
+# end dates
+lccEndDates = []
+hccEndDates = []
 
-# Get number of projects from user
-while True:
-    numProjects = input("Enter number of projects: ")
-    try:
-        numProjects = int(numProjects)
-    except:
-        print("please enter a numerical value")
-        continue
-    if numProjects < 1:
-        print("Please enter value greater than 0")
-        continue
-    break
 
-print("Number of projects for this set = ", numProjects)
-numberProjects = int(numProjects)
+# Open JSON file
+fileName = input("Enter name of file you would like to read (.json files only): ")
+with open(fileName) as file:
 
-# for each project enter the type of city, start date and end date
-while numberProjects > 0:
-    for i in range(numberProjects):
-        print("")
-        print("Project ", str(i + 1))
+    data = json.load(file)
+    dumped = json.dumps(data)
 
-        # get type of city from user
-        typeCity = input("Enter lcc for low cost city or hcc for high cost city: ")
-        while typeCity != "LCC" and typeCity != "lcc" and typeCity != "HCC" and typeCity != "hcc":
-            typeCity = input("Please enter lcc or hcc : ")
+    # print the json file
+    # print(json.dumps(data, indent=2))
+    print()
 
-       # convert user input to uppercase
-        typeCity = typeCity.upper()
+    print("\nPrinting nested dictionary as key-value pair\n")
+    for i in data["projects"]:
+        startDates.append(i["startDate"])
+        start_date = datetime.datetime.strptime(i["startDate"], "%m/%d/%Y").date()
+        endDates.append(i["endDate"])
+        end_date = datetime.datetime.strptime(i["endDate"], "%m/%d/%Y").date()
 
-        # counts the number of LCCs and HCCs for each set of projects
-        if typeCity == "LCC":
-            lccTotal = lccTotal + 1
-        elif typeCity == "HCC":
-            hccTotal = hccTotal + 1
+        if i["name"] not in listEmployees:
+            listEmployees.append(i["name"])
+            numEmployees = numEmployees + 1
 
-        # get start date from user
-        startDay = str(input("Enter start date of project (in MM/DD/YYYY): "))
-        startDate = datetime.datetime.strptime(startDay, "%m/%d/%Y").date()
+        if i["cityType"] == 'LCC':
+            # print(f'Project: {i["cityType"]} City')
+            # print("Name: ", i['name'])
+            # print("Start Date: ", i['startDate'])
+            # print("End Date: ", i['endDate'])
+            # print("City Type: ", i['cityType'])
+            lccStartDates.append(i['startDate'])
+            lccEndDates.append(i['endDate'])
 
-        # Add start date to list
+            if start_date == end_date:
+                numDays = 1
+                numTravelDays = 1
+                numFullDays = 0
+                print("LCC travel Day")
+            else:
+                numDays = end_date - start_date
+                numDays = int(numDays.days + 1)
+                numTravelDays = 2
+                numFullDays = numDays - numTravelDays
+                if numFullDays < 0:
+                    numFullDays = 0
+                #print(numDays)
+                # print(numFullDays)
 
-        startDates.append(startDay)
-
-        # get end date from user
-        endDay = str(input("Enter end date of project (in MM/DD/YYYY): "))
-        endDate = datetime.datetime.strptime(endDay, "%m/%d/%Y").date()
-
-        # Add end date to list
-
-        endDates.append(endDay)
-
-        # calculate number of days for project
-        if endDate == startDate:
-            numDays = 1
-            numTravelDays = 1
-            numFullDays = 0
-        else:
-            numDays = (endDate - startDate)
-            numDays = int(numDays.days + 1)
-            numTravelDays = 2
+            numFullDaysLCC = numFullDaysLCC + numFullDays
+            numTravelDaysLCC = numTravelDaysLCC + numTravelDays
+            # print("")
+            # print("")
+        elif i["cityType"] == 'HCC':
+            # print(f'Project: {i["cityType"]} City')
+            # print("Name: ", i['name'])
+            # print("Start Date: ", i['startDate'])
+            # print("End Date: ", i['endDate'])
+            # print("City Type: ", i['cityType'])
+            hccStartDates.append(i['startDate'])
+            hccEndDates.append(i['endDate'])
+            if i["startDate"] == i["endDate"]:
+                numDays = 1
+                numTravelDays = 1
+                numFullDays = 0
+            else:
+                numDays = end_date - start_date
+                numDays = int(numDays.days + 1)
+                numTravelDays = 2
+                if numFullDays < 0:
+                    numFullDays = 0
+                print(numDays)
+                # print(numFullDays)
             numFullDays = int(numDays - numTravelDays)
+            numFullDaysHCC = numFullDaysHCC + numFullDays
+            numTravelDaysHCC = numTravelDaysHCC + numTravelDays
+            # print("")
+            # print("")
+        # else:
+            # print("Error - City Type unavailable")
+            # print("Name: ", i['name'])
+            # print("Start Date: ", i['startDate'])
+            # print("End Date: ", i['endDate'])
+            # print("City Type: ", i['cityType'])
+            # print("")
+            # print("")
 
-        numberDays = numberDays + numDays
-        numberTravelDays = numberTravelDays + numTravelDays
-        numberFullDays = numberFullDays + numFullDays
+        num_days = num_days + numDays
 
-        numberProjects -= 1
-
-numberUniqueStartDates = Counter(startDates).keys()
-numberUniqueEndDates = Counter(endDates).keys()
-
-print("\nTotal number of Days = ", str(numberDays))
-print("Number of Travel Days = ", str(numberTravelDays))
-print("Number of Full Days = ", str(numberFullDays))
-print("")
-print("Number of LCCs = ", str(lccTotal))
-print("Number of HCCs = ", str(hccTotal))
-print("")
-print("Start Dates")
-print(startDates)
-print("Number of unique start dates = ", len(numberUniqueStartDates))
-
-print("\nEnd Dates")
-print(endDates)
-print("Number of unique end dates = ", len(numberUniqueEndDates))
-
+    # Calculations
+    reimbursement_lcc_td = numTravelDaysLCC * lcc_td_rr
+    reimbursement_lcc_fd = numFullDaysLCC * lcc_fd_rr
+    reimbursement_hcc_td = numTravelDaysHCC * hcc_td_rr
+    reimbursement_hcc_fd = numFullDaysHCC * hcc_fd_rr
+    
+    # print reimbursement rates
+    print("Start Dates: ", startDates)
+    print("End Dates: ", endDates)
+    print("Total Number of Days: ", num_days)
+    print()
+    print("LCC Start Dates: ", lccStartDates)
+    print("LCC End Dates: ", lccEndDates)
+    print("Number of Travel Days: ", numTravelDaysLCC)
+    print("Reimbursement for LCC Travel Days : $", reimbursement_lcc_td)
+    print("Number of Full Days: ", numFullDaysLCC)
+    print("Reimbursement for LCC Full Days : $", reimbursement_lcc_fd)
+    print()
+    print("HCC Start Dates: ", hccStartDates)
+    print("HCC End Dates: ", hccEndDates)
+    print("Number of Travel Days: ", numTravelDaysHCC)
+    print("Reimbursement for HCC Travel Days : $", reimbursement_hcc_td)
+    print("Number of Full Days: ", numFullDaysHCC)
+    print("Reimbursement for HCC Full Days : $", reimbursement_hcc_fd)
+    print()
+    print()
+    print("Number of Employees : ", numEmployees)
+    print("Employees include: ", listEmployees)
 
