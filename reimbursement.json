@@ -1,0 +1,46 @@
+{
+  "projects": [
+    {
+      "name": "Johnathan",
+      "startDate": "01/01/2022",
+      "endDate": "01/05/2022",
+      "cityType": "HCC"
+    },
+    {
+      "name": "Paul",
+      "startDate": "01/06/2022",
+      "endDate": "01/10/2022",
+      "cityType": "LCC"
+    },
+    {
+      "name": "Christopher",
+      "startDate": "01/11/2022",
+      "endDate": "01/16/2022",
+      "cityType": "HCC"
+    },
+    {
+      "name": "Anthony",
+      "startDate": "01/17/2022",
+      "endDate": "01/26/2022",
+      "cityType": "HCC"
+    },
+    {
+      "name": "Johnathan",
+      "startDate": "01/27/2022",
+      "endDate": "01/28/2022",
+      "cityType": "LCC"
+    },
+    {
+      "name": "Michael",
+      "startDate": "01/29/2022",
+      "endDate": "01/30/2022",
+      "cityType": "LCC"
+    },
+    {
+      "name": "Michael",
+      "startDate": "01/31/2022",
+      "endDate": "02/10/2022",
+      "cityType": "LCC"
+    }
+  ]
+}
